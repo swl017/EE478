@@ -1,4 +1,4 @@
-# Assignment for Week3
+# Assignment 1
 ## 1. Create a ROS package.
 ## 2. Write a ros node (refer ‘data_pub.py’).
 * Publish two data as follows:
