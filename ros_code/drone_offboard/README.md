@@ -10,8 +10,10 @@ First, git clone this repository to your `catkin_ws` and build using `catkin_mak
 ```bash
 sudo apt update
 sudo apt install git
-cd ~/catkin_ws/src
+cd ~/
 git clone https://github.com/swl017/EE478.git
+mv ros_code/drone_offboard/ ~/catkin_ws/src
+cd ~/catkin_ws
 catkin_make
 ```
 
@@ -36,6 +38,6 @@ rosrun drone_offboard drone_offboard_node
 ```
 
 > `offboard_node_py.py` is written in Python, and has more functionalities. Recommanded to start with this if you are not familiar with ROS or C++. \
-`drone_offboard_node` is the example offboard code from the [PX4 official documentation](https://docs.px4.io/master/en/ros/mavros_offboard.html) wirtten in C++. It is written in the bare minimum, so students may upgrade the code by adding functions to fit their needs or turn the code into a class for efficient coding.
+`drone_offboard_node` is the example offboard code from the [PX4 official documentation](https://docs.px4.io/master/en/ros/mavros_offboard.html) wirtten in C++. It is written in the bare minimum, so interested students may upgrade the code by adding functions to fit their needs or turn the code into a class for efficient coding.
 
 The drone should arm and takeoff.
