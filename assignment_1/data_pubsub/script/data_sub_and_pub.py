@@ -12,7 +12,7 @@ TODO Subscribe two data and publish two data as follows
 
 @ Data 3 to publish
 : Publish the sum of the message data array whose topic name is "/data2"
-: Publish the message in 100 HZ
+: Publish the message in 10 HZ
 - message topic name : "/data3"
 - message type : Float32
 

@@ -5,11 +5,11 @@
 1. Data 1
     - topic name is "/data1"
     - message type is std_msgs/Float32 (You can set the data value arbitrary.)
-    - rate is 100 Hz
+    - rate is 10 Hz
 2. Data 2
     - topic name is "/data2"
     - message type is std_msgs/Float32MultiArray (You can set the data values arbitrary.)
-    - rate is 50 Hz
+    - rate is 5 Hz
 
 ## 3. Write a ros node (refer 'data_sub_and_pub.py’).
 * Subscribe two data as follows:
@@ -23,7 +23,7 @@
 * Publish two data as follows:
 1. Data 3
     - publish the sum of the message data array whose topic name is "/data2"
-    - publish data in 100 HZ
+    - publish data in 10 HZ
     - topic name is "/data3"
     - message type is std_msgs/Float32
 

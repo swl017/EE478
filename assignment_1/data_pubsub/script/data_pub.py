@@ -5,12 +5,12 @@ TODO Publish two data as follows:
 @ Data 1 to publish
 - message topic name : "/data1"
 - message type : Float32
-- message rate : 100 Hz
+- message rate : 10 Hz
 
 @ Data 2 to publish
 - message topic name : "/data2"
 - message type : Float32MultiArray
-- message rate : 50 Hz
+- message rate : 5 Hz
 
 """
 
