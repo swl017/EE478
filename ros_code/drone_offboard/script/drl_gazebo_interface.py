@@ -24,7 +24,7 @@ class Interface():
         # Member variables
         self.rate = rospy.Rate(20) # Default 20 Hz, overwritten in the main function
         self.last_request = rospy.Time.now()
-        self.current_state = State() # drone mode state
+        self.operation_state = State() # drone operation state
         self.current_odom = Odometry() # pose and velocity
         self.current_pwm = RCOut()
         
@@ -39,12 +39,14 @@ class Interface():
         
 
         # Subscribers
+        self.operation_state_sub = rospy.Subscriber('mavros/state', State, self.operation_state_sub_callback)
         self.current_odom_sub = rospy.Subscriber('ground_truth/state', Odometry, self.current_odom_sub_callback) # map frame velocity
         # self.current_odom_sub = rospy.Subscriber('mavros/local_position/odom', Odometry, self.current_odom_sub_callback) # map frame velocity
         self.current_pose_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, self.current_pose_sub_callback)
         self.current_velocity_body_sub = rospy.Subscriber('mavros/local_position/velocity_body', TwistStamped, self.current_velocity_body_sub_callback) # body frame velocity
         self.current_velocity_odom_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, self.current_velocity_odom_sub_callback) # map frame velocity
         self.current_pwm_sub = rospy.Subscriber('mavros/rc/out', RCOut, self.current_pwm_sub_callback)
+        self.lidar_sub = rospy.Subscriber('/os1_cloud_node/points', RCOut, self.lidar_sub_callback)
 
         # Publishers
         self.local_pose_pub = rospy.Publisher('mavros/setpoint_position/local', PoseStamped, queue_size=1) # map frame
@@ -61,6 +63,7 @@ class Interface():
     def run(self):
         """
         Main algorithm
+        Write code to your needs
         """
         self.reset_world()
 
@@ -85,10 +88,11 @@ class Interface():
 
     def get_reset_condition(self, odom, rcout):
         """
-        Define your reset condition
+        Define your own reset condition
         """
         reset_condition = self.is_flipped(odom.pose.pose.orientation) \
-                            or self.is_stuck(odom.twist.twist.linear, rcout.channels[:self.rc_channels_num])
+                            or self.is_stuck(odom.twist.twist.linear, rcout.channels[:self.rc_channels_num]) \
+                            or not self.is_at_origin(odom.pose.pose.position)
         return reset_condition
 
     def is_flipped(self, orientation):
@@ -126,7 +130,7 @@ class Interface():
         x0 = 0.0
         y0 = 0.0
         z0 = 0.0
-        distance_thres = 2.4 # 2.4 m
+        distance_thres = 7 # meters
 
         x = position.x
         y = position.y
@@ -144,30 +148,80 @@ class Interface():
         (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
         return roll, pitch, yaw
 
+    def operation_state_sub_callback(self, msg):
+        self.operation_state = msg
+
     def current_odom_sub_callback(self, msg):
         self.current_odom = msg
 
     def current_pose_sub_callback(self, msg):
+        """
+        Write code to your needs
+        """
         pass
 
     def current_velocity_body_sub_callback(self, msg):
+        """
+        Write code to your needs
+        """
         pass
 
     def current_velocity_odom_sub_callback(self, msg):
+        """
+        Write code to your needs
+        """
         pass
 
     def current_pwm_sub_callback(self, msg):
         self.current_pwm = msg
 
+    def lidar_sub_callback(self, msg):
+        """
+        Write code to your needs
+        """
+        pass
+
+    def set_arm(self):
+        rospy.loginfo("Arming the vehicle..")
+        while not rospy.is_shutdown():
+            if self.operation_state.armed is not True \
+                and rospy.Time.now() - self.last_request > rospy.Duration(3):
+                self.arming_client(value = True)
+                self.last_request = rospy.Time.now()
+            elif self.operation_state.armed is True:
+                break
+            self.rate.sleep()
+
+    def set_disarm(self):
+        rospy.loginfo("Disarming the vehicle..")
+        while not rospy.is_shutdown():
+            if self.operation_state.armed is True \
+                and rospy.Time.now() - self.last_request > rospy.Duration(3):
+                self.arming_client(value = False)
+                self.last_request = rospy.Time.now()
+            elif self.operation_state.armed is False:
+                break
+            self.rate.sleep()
+
+    def set_mode(self, mode):
+        rospy.loginfo("Setting vehicle mode..")
+        while True:
+            if self.operation_state.mode != mode \
+                and rospy.Time.now() - self.last_request > rospy.Duration(3):
+                self.set_mode_client(base_mode=0, custom_mode=mode)
+                self.last_request = rospy.Time.now()
+            elif self.operation_state.mode != mode:
+                break
+            self.rate.sleep()
+
+
 if __name__ == '__main__':
     rospy.init_node('drl_gazebo_interface',anonymous=False)
     interface = Interface()
 
-
     rospy.loginfo("DRL Gazebo interface node ready")
 
-    # TODO set rate?
-    interface.rate = rospy.Rate(20) # 20 hz or whatever
+    interface.rate = rospy.Rate(20) # 20 hz
     while not rospy.is_shutdown():
         interface.run()
         interface.rate.sleep()
