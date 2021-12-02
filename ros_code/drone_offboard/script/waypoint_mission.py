@@ -36,13 +36,10 @@ class Mission():
                + (z-self.waypoints_z[self.waypoint_index])**2
         if dist < 1.5:
             self.waypoint_index = min(self.waypoint_index + 1, len(self.waypoints_x) -1)
-        
-        x_ref = (self.waypoints_x[self.waypoint_index] - x)/dist * 1.5 + x
-        y_ref = (self.waypoints_y[self.waypoint_index] - y)/dist * 1.5 + y
-        z_ref = (self.waypoints_z[self.waypoint_index] - z)/dist * 1.5 + z
+            print("target waypoint (%.1f, %.1f, %.1f)" \
+                %(self.waypoints_x[self.waypoint_index],self.waypoints_y[self.waypoint_index],self.waypoints_z[self.waypoint_index]))
 
         return self.waypoints_x[self.waypoint_index], self.waypoints_y[self.waypoint_index], self.waypoints_z[self.waypoint_index] 
-        # return x_ref, y_ref, z_ref
 
     def odom_sub_callback(self, msg):
         self.current_odom = msg
