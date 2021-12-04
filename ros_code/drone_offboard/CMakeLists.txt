@@ -51,3 +51,6 @@ add_executable(${PROJECT_NAME}_node_ex src/offboard_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
+target_link_libraries(${PROJECT_NAME}_node_ex
+  ${catkin_LIBRARIES}
+)
